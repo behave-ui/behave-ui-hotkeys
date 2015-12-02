@@ -2,9 +2,10 @@ var Marionette = require('backbone.marionette'),
     Backbone = require('backbone'),
     _ = require('underscore'),
     Hotkeys = require('../../behave-ui-hotkeys'),
+    viewDefaults,
     View;
 
-View = Marionette.ItemView.extend({
+viewDefaults = {
     template: _.template('<h1>Hotkeys Behavior</h1>'),
     model: new Backbone.Model(),
     behaviors: {
@@ -19,7 +20,9 @@ View = Marionette.ItemView.extend({
     },
     save: function() { this.model.save(); },
     openFilePicker: function(e) { e.preventDefault(); }
-});
+};
+
+View = Marionette.ItemView.extend(viewDefaults);
 
 describe('Hotkeys Behavior', function() {
     var behavior;
@@ -106,6 +109,41 @@ describe('Hotkeys Behavior', function() {
             spyOn(this.view.model, 'save');
             behavior._processHotkeys(evt);
             expect(this.view.save).toHaveBeenCalledWith(evt);
+        });
+    });
+
+    describe('events attached to `document`', function() {
+        var viewOptions,
+            DocumentView,
+            evt;
+
+        viewOptions = _.clone(viewDefaults);
+        viewOptions.behaviors.Hotkeys.attachToDocument = true;
+        DocumentView = Marionette.ItemView.extend(viewOptions);
+        evt = {
+            which: 79,
+            metaKey: false,
+            ctrlKey: true,
+            altKey: false,
+            shiftKey: false
+        };
+
+        beforeEach(function() {
+            this.view = new DocumentView({ model: new Backbone.Model() });
+            this.view.render();
+        });
+
+        it('will call the event callback after rendering', function() {
+            spyOn(this.view, 'openFilePicker');
+            Backbone.$(document).trigger(Backbone.$.Event('keydown', evt));
+            expect(this.view.openFilePicker).toHaveBeenCalled();
+        });
+
+        it('will not call the event callback after destroying', function() {
+            spyOn(this.view, 'openFilePicker');
+            this.view.destroy();
+            Backbone.$(document).trigger(Backbone.$.Event('keydown', evt));
+            expect(this.view.openFilePicker).not.toHaveBeenCalled();
         });
     });
 });

@@ -50,7 +50,8 @@
         },
         onRender: function() {
             if (this.options.attachToDocument) {
-                $(document).on('keydown', this._processHotkeys.bind(this));
+                this._processHotkeys = this._processHotkeys.bind(this);
+                Backbone.$(document).on('keydown', this._processHotkeys);
             }
 
             // make non-focusable elements focusable
@@ -123,7 +124,7 @@
         },
         onBeforeDestroy: function() {
             if (this.options.attachToDocument) {
-                $(document).off('keydown', this._processHotkeys.bind(this));
+                Backbone.$(document).off('keydown', this._processHotkeys);
             }
         }
     });
