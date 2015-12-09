@@ -46,7 +46,7 @@
             }
 
             this.hotkeys = [];
-            _(this.options.hotkeys).each(this._buildHotkeyCache.bind(this));
+            _(this.options.hotkeys).each(this._buildHotkeyCache.bind(this)).value();
         },
         onRender: function() {
             if (this.options.attachToDocument) {
@@ -81,7 +81,7 @@
                 .each(function(hk) {
                     this.view.trigger('hotkey:' + hk.hotkey);
                     if (this.view[hk.method]) this.view[hk.method](e);
-                }.bind(this));
+                }.bind(this)).value();
         },
         _buildHotkeyCache: function(method, hotkey) {
             var cmd = false,
@@ -110,7 +110,7 @@
                         code = lookup(k);
                         break;
                 }
-            });
+            }).value();
 
             this.hotkeys.push({
                 hotkey: hotkey,
